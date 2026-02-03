@@ -1,0 +1,11 @@
+{
+  "base6StarRate": 0.008,
+  "softPityStart": 65,
+  "softPityIncrement": 0.05,
+  "hardPity": 80,
+  "sparkGuarantee": 120,
+  "featuredRateOn6Star": 0.5,
+  "oroPerPull": 500,
+  "tenPullDiscount": false,
+  "fiveStarEvery10Pulls": true
+}
