@@ -1,0 +1,19 @@
+{
+  "current": {
+    "name": "Laevatain",
+    "endDate": "2026-02-07"
+  },
+  "upcoming": [
+    {
+      "name": "Gilberta",
+      "startDate": "2026-02-07",
+      "endDate": "2026-02-24"
+    },
+    {
+      "name": "Yvonne",
+      "startDate": "2026-02-24",
+      "endDate": "2026-03-13"
+    }
+  ],
+  "basicBanner": true
+}
