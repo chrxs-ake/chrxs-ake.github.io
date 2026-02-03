@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endfield Pull Sim - F2P Planner & Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#1a1a2e] text-white font-sans">
+    <header class="bg-[#0f3460] py-4 px-6 flex items-center justify-between border-b border-[#e94560]">
+        <div>
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                🎲 Endfield Pull Sim
+            </h1>
+            <p class="text-sm text-gray-400">F2P Pity • Spark • Monte Carlo Planner</p>
+        </div>
+        <a href="https://ko-fi.com/yourusername" target="_blank"
+           class="bg-[#e94560] hover:bg-[#ff5e7a] px-5 py-2 rounded-lg font-medium flex items-center gap-2 transition">
+            ☕ Buy Me a Coffee
+        </a>
+    </header>
+
+    <div class="max-w-5xl mx-auto p-4">
+        <!-- Current Banner -->
+        <div id="currentBanner" class="bg-[#16213e] rounded-2xl p-5 mb-6 flex items-center justify-between">
+            <div>
+                <div class="uppercase text-xs tracking-widest text-[#e94560]">CURRENT LIMITED BANNER</div>
+                <div id="bannerName" class="text-3xl font-bold">Laevatain</div>
+                <div id="bannerEnd" class="text-sm text-gray-400">Ends Feb 7, 2026</div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-gray-400">Featured 6★</div>
+                <div class="text-[#e94560] font-medium">Laevatain (Heat DPS)</div>
+            </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="md:col-span-1 bg-[#16213e] rounded-3xl p-6">
+                <h2 class="uppercase text-xs tracking-widest text-gray-400 mb-4">YOUR CURRENT PROGRESS</h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="flex justify-between text-sm mb-1">
+                            <span>Pity (toward 6★)</span>
+                            <span id="pityValue" class="font-mono text-[#e94560]">0</span>
+                        </label>
+                        <input type="range" id="pity" min="0" max="79" value="0" class="w-full accent-[#e94560]">
+                    </div>
+
+                    <div>
+                        <label class="flex justify-between text-sm mb-1">
+                            <span>Spark Progress (on current banner)</span>
+                            <span id="sparkValue" class="font-mono text-[#e94560]">0</span>
+                        </label>
+                        <input type="range" id="spark" min="0" max="119" value="0" class="w-full accent-[#e94560]">
+                    </div>
+
+                    <div>
+                        <label class="flex justify-between text-sm mb-1">
+                            <span>Oroberyl</span>
+                            <span id="oroValue" class="font-mono">0</span>
+                        </label>
+                        <input type="number" id="oroberryl" value="0" class="w-full bg-[#0f3460] border border-[#e94560]/30 rounded-lg px-4 py-3 text-lg font-mono focus:outline-none focus:border-[#e94560]">
+                        <div class="text-xs text-gray-500 mt-1">1 pull = 500 Oroberyl</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-[#0f3460] p-4 rounded-2xl">
+                    <div class="text-xs uppercase tracking-widest text-gray-400">Max affordable pulls</div>
+                    <div id="maxPulls" class="text-4xl font-bold text-[#e94560] font-mono">0</div>
+                    <div id="oroNeeded" class="text-sm text-gray-400"></div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 gap-3">
+                    <button id="singlePullBtn" class="bg-green-600 hover:bg-green-700 py-4 rounded-2xl font-medium transition flex flex-col items-center">
+                        <span class="text-xs opacity-75">SINGLE</span>
+                        PULL
+                    </button>
+                    <button id="tenPullBtn" class="bg-green-600 hover:bg-green-700 py-4 rounded-2xl font-medium transition flex flex-col items-center">
+                        <span class="text-xs opacity-75">10-PULL</span>
+                        PULL
+                    </button>
+                </div>
+
+                <button id="simulateBtn" class="mt-4 w-full bg-[#e94560] hover:bg-[#ff5e7a] py-4 rounded-2xl font-bold text-lg transition">
+                    SIMULATE 50,000 RUNS
+                </button>
+            </div>
+
+            <!-- Results Area -->
+            <div class="md:col-span-2">
+                <div id="warningBox" class="hidden bg-red-900/80 border-l-4 border-red-500 p-4 rounded-xl mb-6">
+                    <div class="font-bold text-red-400">⚠️ RISKY PULLING!</div>
+                    <div id="warningText" class="text-sm"></div>
+                </div>
+
+                <div id="resultsPanel" class="hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
+                    
+                    <div class="bg-[#16213e] rounded-3xl p-6 mb-6">
+                        <div class="flex justify-between mb-3">
+                            <div class="uppercase text-xs tracking-widest text-gray-400">Probability Distribution</div>
+                            <div id="avgPullsDisplay" class="font-mono text-[#e94560] text-xl"></div>
+                        </div>
+                        <canvas id="probChart" height="180"></canvas>
+                    </div>
+
+                    <div id="pullGuide" class="bg-[#0f3460] p-5 rounded-2xl text-sm"></div>
+                </div>
+
+                <div id="pullHistory" class="mt-8 hidden">
+                    <div class="uppercase text-xs tracking-widest text-gray-400 mb-3">RECENT PULLS (TEST MODE)</div>
+                    <div id="historyList" class="font-mono text-xs bg-black/40 p-4 rounded-xl h-48 overflow-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Banner Planner (Accordion) -->
+        <div class="mt-12">
+            <details class="group">
+                <summary class="cursor-pointer bg-[#16213e] px-6 py-5 rounded-3xl flex justify-between items-center hover:bg-[#1e2a52]">
+                    <div>
+                        <div class="uppercase text-xs tracking-widest text-gray-400">MULTI-BANNER F2P PLANNER</div>
+                        <div class="text-lg font-medium">How many banners can you spark?</div>
+                    </div>
+                    <div class="text-2xl group-open:rotate-180 transition">▼</div>
+                </summary>
+                <div class="mt-4 bg-[#16213e] rounded-3xl p-6">
+                    <div class="flex gap-4 items-end mb-6">
+                        <div class="flex-1">
+                            <div class="text-xs uppercase tracking-widest text-gray-400 mb-1">Weekly Oro Farm</div>
+                            <input type="number" id="weeklyFarm" value="5000" class="w-full bg-[#0f3460] px-4 py-3 rounded-xl font-mono text-lg">
+                        </div>
+                        <button id="planBtn" class="bg-[#e94560] px-8 py-3 rounded-xl font-medium">CALCULATE PLAN</button>
+                    </div>
+                    <table id="plannerTable" class="w-full text-sm"></table>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <footer class="text-center text-xs text-gray-500 py-8 border-t border-gray-800 mt-16">
+        Data from endfield.gg • Rates accurate as of Feb 2026 • Not affiliated with Hypergryph
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
